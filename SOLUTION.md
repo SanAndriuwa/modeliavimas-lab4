@@ -2,6 +2,8 @@
 
 [lab4_main.m](lab4_main.m) apskaičiuoja visus užduoties variantus. `difapx.m` sprendžia nedidelę tiesinių lygčių sistemą finite-difference svoriams rasti; pirmosios išvestinės rezultatas dalijamas iš h, antrosios iš h².
 
+`difapx.m` išskirta iš pateikto `pade.m`, išlaikant jos penkis išėjimus ir koeficientų sistemą. Integravimas vykdomas iškviečiant atskiras pateiktų failų funkcijas: `trpzds()`, `smpsns()`, `rmbrg()`, `adapt_smpsn()`, `Gauss_Legendre()` ir `Gauss_Hermite()`. Pavadinimų atitikmenys pateikti README.
+
 ## Diferencijavimas
 
 Trijų taškų centrinės formulės paprastai turi O(h²) paklaidą, penkių taškų formulės O(h⁴). Kubinei funkcijai penkių taškų formulė yra tiksli iki apvalinimo paklaidos.
@@ -64,7 +66,9 @@ Adaptyvus Simpsonas lygina viso intervalo įvertį su dviejų pusių suma, dalij
 
 `quad()` tiesioginis iškvietimas šiame svyruojančiame pavyzdyje davė didelę paklaidą, nors tol=10⁻⁴. Paklaidos įvertis nėra garantija, jei pradiniai taškai praleidžia svyravimus. Šis rezultatas paliktas palyginimo lentelėje. 20 Gauss-Legendre mazgų visame ilgame intervale taip pat nepakanka geram rezultatui.
 
-Gauss-Hermite svoriai skirti **exp(-x²)** svoriui visoje realioje ašyje. Antrojo integralo pusės ašies reikšmė gaunama iš pusės svorių sumos; atimamas intervalas [0,a] ir uodega [b,∞]. Tai ištaiso pateikto `Gauss_Hermite.m` netinkamą baigtinio intervalo pakeitimą. Gauss metodų mazgai ir svoriai randami iš simetrinių rekurencijos matricų.
+Gauss-Hermite svoriai skirti **exp(-x²)** svoriui visoje realioje ašyje. Antrojo integralo pusės ašies reikšmė gaunama kviečiant `Gauss_Hermite(@(x) ones(size(x)),20)/2`; atimamas intervalas [0,a] ir uodega [b,∞]. Tai ištaiso pateikto `Gauss_Hermite.m` netinkamą baigtinio intervalo pakeitimą.
+
+Abiem Gauss metodams dabar naudojamas pateiktų failų kelias: Legendre/Hermite polinomai sudaromi jų rekurencijomis, mazgai gaunami `roots()`, svoriai randami sprendžiant pateiktas momentų sistemas. Šie metodai nebėra pakeisti rekurencijos matricos `eig()` algoritmu.
 
 ## Patikrinimas
 

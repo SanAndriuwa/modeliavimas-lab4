@@ -50,8 +50,8 @@ for variant = 1:3
     f = integrands{variant}; errors = zeros(2,3);
     for i = 1:2
         N = Ns(i);
-        estimates = [trapezoid(f,0,upper(variant),N) ...
-            simpson(f,0,upper(variant),N) romberg(f,0,upper(variant),N)];
+        estimates = [trpzds(f,0,upper(variant),N) ...
+            smpsns(f,0,upper(variant),N) rmbrg(f,0,upper(variant),0,log2(N)+1)];
         errors(i,:) = abs(estimates-exact(variant));
     end
     disp(array2table([Ns' errors],'VariableNames', ...
@@ -94,17 +94,18 @@ for variant = 1:2
     fprintf('Reference on [a,100]: %.12f\n',finiteExact);
     fprintf('Omitted interval and tail: %.6g\n',infiniteExact-finiteExact);
     estimates = zeros(5,1);
-    estimates(1) = simpson(f,a,b,N);
-    estimates(2) = adaptive_simpson(f,a,b,tolerance);
+    estimates(1) = smpsns(f,a,b,N);
+    estimates(2) = adapt_smpsn(f,a,b,tolerance);
     estimates(3) = quad(f,a,b,tolerance);
     estimates(4) = quadl(f,a,b,tolerance);
     if variant == 1
-        estimates(5) = gauss_legendre(f,a,b,gaussN);
+        estimates(5) = Gauss_Legendre(f,a,b,gaussN);
         gaussName = 'Gauss-Legendre';
     else
         % Hermite integrates exp(-x^2)*g(x) on the whole real line.
         % For g=1 the half-line integral is half the sum of weights.
-        estimates(5) = gauss_hermite_half(gaussN)-integral(f,0,a)-integral(f,b,inf);
+        estimates(5) = Gauss_Hermite(@(x) ones(size(x)),gaussN)/2 ...
+            -integral(f,0,a)-integral(f,b,inf);
         gaussName = 'Gauss-Hermite';
     end
     Method = {'Simpson'; 'Adaptive Simpson'; 'quad'; 'quadl'; gaussName};
@@ -123,68 +124,3 @@ set(findall(groot,'Type','figure'),'Color','w');
 set(findall(groot,'Type','axes'),'Color','w','XColor','k','YColor','k');
 set(findall(groot,'Type','legend'),'Color','w','TextColor','k');
 set(findall(groot,'Type','text'),'Color','k');
-
-function I = trapezoid(f,a,b,N)
-h = (b-a)/N; y = f(linspace(a,b,N+1));
-I = h*((y(1)+y(end))/2+sum(y(2:end-1)));
-end
-
-function I = simpson(f,a,b,N)
-h = (b-a)/N; y = f(linspace(a,b,N+1));
-I = h/3*(y(1)+y(end)+4*sum(y(2:2:end-1))+2*sum(y(3:2:end-2)));
-end
-
-function I = romberg(f,a,b,N)
-% The final row uses exactly N intervals; no early stopping.
-levels = round(log2(N))+1; R = zeros(levels);
-for row = 1:levels
-    R(row,1) = trapezoid(f,a,b,2^(row-1));
-    for col = 2:row
-        R(row,col) = (4^(col-1)*R(row,col-1)-R(row-1,col-1))/(4^(col-1)-1);
-    end
-end
-I = R(end,end);
-end
-
-function I = adaptive_simpson(f,a,b,tolerance)
-% Begin with short intervals so oscillations cannot be missed on [a,100].
-segments = max(1,ceil(b-a));
-edges = linspace(a,b,segments+1);
-I = 0;
-for i = 1:segments
-    left = edges(i); right = edges(i+1);
-    whole = simpson(f,left,right,2);
-    I = I+refine(f,left,right,whole,tolerance/segments,0);
-end
-end
-
-function I = refine(f,a,b,whole,tolerance,depth)
-mid = (a+b)/2;
-left = simpson(f,a,mid,2); right = simpson(f,mid,b,2);
-difference = left+right-whole;
-if abs(difference) <= 15*tolerance
-    I = left+right+difference/15;
-elseif depth >= 30
-    error('Adaptive Simpson reached the recursion limit.');
-else
-    I = refine(f,a,mid,left,tolerance/2,depth+1) ...
-        +refine(f,mid,b,right,tolerance/2,depth+1);
-end
-end
-
-function I = gauss_legendre(f,a,b,N)
-% Nodes and weights from the symmetric Legendre recurrence matrix.
-j = 1:N-1; offDiagonal = j./sqrt(4*j.^2-1);
-J = diag(offDiagonal,1)+diag(offDiagonal,-1);
-[vectors,D] = eig(J);
-nodes = diag(D)'; weights = 2*vectors(1,:).^2;
-x = (a+b)/2+(b-a)/2*nodes;
-I = (b-a)/2*sum(weights.*f(x));
-end
-
-function I = gauss_hermite_half(N)
-offDiagonal = sqrt((1:N-1)/2);
-[vectors,~] = eig(diag(offDiagonal,1)+diag(offDiagonal,-1));
-weights = sqrt(pi)*vectors(1,:).^2;
-I = sum(weights)/2;
-end

@@ -1,14 +1,21 @@
-function c = difapx(order,points)
-% Finite-difference weights for the integer offsets points(1):points(2).
-offsets = points(1):points(2);
-count = length(offsets);
-if count < order+1
-    error('More nodes are needed for this derivative.');
+function [c,err,eoh,A,b] = difapx(N,points)
+% difapx() extracted from the supplied pade.m, with preallocated arrays.
+l = max(points);
+L = abs(points(1)-points(2))+1;
+if L < N+1, error('More points are needed.'); end
+A = zeros(L+2,L);
+for n = 1:L
+    A(1,n) = 1;
+    for m = 2:L+2
+        A(m,n) = A(m-1,n)*l/(m-1);
+    end
+    l = l-1;
 end
-A = zeros(count);
-for power = 0:count-1
-    A(power+1,:) = offsets.^power/factorial(power);
+b = zeros(L,1); b(N+1) = 1;
+c = (A(1:L,:)\b)';
+err = A(L+1,:)*c'; eoh = L-N;
+if abs(err) < eps
+    err = A(L+2,:)*c'; eoh = L-N+1;
 end
-rhs = zeros(count,1); rhs(order+1) = 1;
-c = (A\rhs)';
+if points(1) < points(2), c = fliplr(c); end
 end

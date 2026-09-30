@@ -49,6 +49,22 @@ Raskite simbolines reikšmes ir palyginkite Simpsono, adaptyvųjį Simpsono, `qu
 
 Šaltinis: `Diff_Int.pdf`, `Int.zip` ir `difapx()` iš pateikto `pade.m`.
 
+## Pateiktų funkcijų naudojimas
+
+Visi skaitiniai metodai kviečiami kaip atskiros funkcijos; pagrindiniame skripte jų algoritmų nebėra.
+
+| Pateiktas failas | Naudojamas failas ir funkcija |
+|---|---|
+| Trapezoid.m | `trpzds.m` → `trpzds()` |
+| Simpsons.m | `smpsns.m` → `smpsns()` |
+| Romberg.m | `rmbrg.m` → `rmbrg()` |
+| Adaptive_Simpsons.m | `adapt_smpsn.m` → `adapt_smpsn()` |
+| Gauss_Legendre.m | `Gauss_Legendre.m` → `Gauss_Legendre()` |
+| Gauss_Hermite.m | `Gauss_Hermite.m` → `Gauss_Hermite()` |
+| difapx() iš pade.m | `difapx.m` → `difapx()` |
+
+Failų pavadinimai suderinti su jų pagrindinių funkcijų pavadinimais. Išlaikytos pateiktos formulės, polinomų rekurencijos ir momentų sistemos. Adaptyviam metodui pridėtas pradinis intervalų skaidymas. Gauss-Hermite pataisytas svorinio integralo taikymas: `Gauss_Hermite(g,N)` skaičiuoja exp(-x²)·g(x) integralą visoje realioje ašyje.
+
 ## Paleidimas
 
 Atidarykite [lab4_main.m](lab4_main.m) ir paspauskite **Run**. Visi `.m` failai turi būti viename aplanke. `int()` daliai reikalingas **Symbolic Math Toolbox**. Be jo skriptas naudoja žinomas analitines reikšmes ir aiškiai praneša, kad simbolinis skaičiavimas nebuvo vykdytas.
