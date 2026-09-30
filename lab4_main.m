@@ -118,6 +118,12 @@ for variant = 1:2
     title(sprintf('Improper integral %d: integrand on [a,10]',variant));
 end
 
+% Keep plots readable when MATLAB uses a dark theme.
+set(findall(groot,'Type','figure'),'Color','w');
+set(findall(groot,'Type','axes'),'Color','w','XColor','k','YColor','k');
+set(findall(groot,'Type','legend'),'Color','w','TextColor','k');
+set(findall(groot,'Type','text'),'Color','k');
+
 function I = trapezoid(f,a,b,N)
 h = (b-a)/N; y = f(linspace(a,b,N+1));
 I = h*((y(1)+y(end))/2+sum(y(2:end-1)));
