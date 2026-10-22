@@ -6,7 +6,7 @@ Atidarykite `lab4_main.m` ir paspauskite Run. Visi `.m` failai turi būti vienam
 
 Be šio toolbox programa veikia su žinoma π/2 reikšme ir aiškiai praneša, kad int nebuvo vykdytas.
 
-Skripto pradžioje nustatykite `variantas = 1`, 2 arba 3 pagal dėstytojo nurodymą. Numatyta 1, nes PDF asmeninio varianto formulės nepateikia.
+Skripto pradžioje nustatykite `variantas = 1`, 2 arba 3 pagal dėstytojo nurodymą. Numatyta 1, nes PDF asmeninio varianto formulės nepateikia. Kaip antrame darbe, `switch variantas` bloke kiekvienam `case` aiškiai užrašyti visi to varianto duomenys: diferencijavimo funkcija ir taškas, lentelė, integravimo funkcija ir riba.
 
 Programa pateikia užduoties lenteles:
 
