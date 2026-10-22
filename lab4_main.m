@@ -35,9 +35,15 @@ for i = 1:2
     d = isvestines(yf,h);
     paklaidos(i,:) = abs(d-tikros([1 1 2 2]));
 end
-disp('Analitines funkcijos isvestiniu absoliucios paklaidos:');
-disp(array2table([h_reiksmes' paklaidos],'VariableNames', ...
-    {'h','First3','First5','Second3','Second5'}));
+fprintf('\nSKAITINIS DIFERENCIJAVIMAS. 1 uzduotis: paklaidos\n');
+fprintf("f'(x)       h          5.1.8.             5.1.9.\n");
+for i = 1:2
+    fprintf('         %5.2f    %16.9g    %16.9g\n',h_reiksmes(i),paklaidos(i,1:2));
+end
+fprintf("f''(x)      h          5.3.1.             5.3.2.\n");
+for i = 1:2
+    fprintf('         %5.2f    %16.9g    %16.9g\n',h_reiksmes(i),paklaidos(i,3:4));
+end
 
 % Lenteles duomenu diferencijavimas.
 d = isvestines(y,x(2)-x(1));
@@ -45,10 +51,19 @@ p2 = lagran(x(2:4),y(2:4));
 p4 = lagran(x,y);
 dp = [polyval(polyder(p2),x(3)) polyval(polyder(p4),x(3)) ...
     polyval(polyder(polyder(p2)),x(3)) polyval(polyder(polyder(p4)),x(3))];
-disp('Lenteles duomenu isvestines:');
-disp(array2table([d; dp],'VariableNames', ...
-    {'First3','First5','Second3','Second5'}, ...
-    'RowNames',{'Finite differences','Lagrange'}));
+fprintf('\nSKAITINIS DIFERENCIJAVIMAS. 2 uzduotis: isvestines ties x3\n');
+fprintf('%-42s %16s\n','Isvestine pagal formule','Reiksme');
+eilutes = {"f'(x3),  5.1.8.", "f'(x3),  5.1.9.", ...
+    "f''(x3), 5.3.1.", "f''(x3), 5.3.2."};
+for j = 1:4
+    fprintf('%-42s %16.9g\n',eilutes{j},d(j));
+end
+fprintf('\nLagranzo daugianariu isvestines:\n');
+eilutes = {"f'(x3),  l2(x)", "f'(x3),  l4(x)", ...
+    "f''(x3), l2(x)", "f''(x3), l4(x)"};
+for j = 1:4
+    fprintf('%-42s %16.9g\n',eilutes{j},dp(j));
+end
 
 % Baigtinis integralas: tas pats destytojo paskirtas variantas.
 Ns = [4 8]; paklaidos = zeros(2,3);
@@ -58,9 +73,11 @@ for i = 1:2
         rmbrg(g,0,b,0,log2(N)+1)];
     paklaidos(i,:) = abs(I-tikslus);
 end
-disp('Baigtinio integralo absoliucios paklaidos:');
-disp(array2table([Ns' paklaidos],'VariableNames', ...
-    {'N','Trapezoid','Simpson','Romberg'}));
+fprintf('\nSKAITINIS INTEGRAVIMAS. 1 uzduotis: paklaidos\n');
+fprintf(' N    Trapeciju metodas    Simpsono metodas    Rombergo metodas\n');
+for i = 1:2
+    fprintf('%2d    %16.9g    %16.9g    %16.9g\n',Ns(i),paklaidos(i,:));
+end
 
 % Netiesioginis integralas sin(x)/x nuo 0 iki begalybes.
 if exist('syms','file') == 2
@@ -76,11 +93,14 @@ f = @(x) sin(x)./x;
 a = 0.001; b = 100; N = 200; tol = 1e-4; IGL = 20;
 I = [smpsns(f,a,b,N); adapt_smpsn(f,a,b,tol); ...
     quad(f,a,b,tol); quadl(f,a,b,tol); Gauss_Legendre(f,a,b,IGL)];
-% Atskiriame skaitine paklaida nuo nukirstos integralo dalies.
-I_baigtinis = integral(f,a,b,'AbsTol',1e-12,'RelTol',1e-12);
-metodai = {'Simpson'; 'Adaptive Simpson'; 'quad'; 'quadl'; 'Gauss-Legendre'};
-disp(table(metodai,I,abs(I-I_tikslus),abs(I-I_baigtinis), ...
-    'VariableNames',{'Method','Integral','ErrorToInfinite','ErrorOnFiniteInterval'}));
+fprintf('\nSKAITINIS INTEGRAVIMAS. 2 uzduotis: paklaidos\n');
+fprintf('Etalonas: integralas nuo 0 iki begalybes = pi/2.\n');
+fprintf('Skaitiniai metodai skaiciuoja intervale [0.001,100].\n');
+metodai = {'Simpsono metodas'; 'Adaptyvus metodas'; 'quad()'; 'quadl()'; 'Gauss-Legendre'};
+fprintf('%-24s %16s\n','Metodas','Paklaida');
+for j = 1:5
+    fprintf('%-24s %16.9g\n',metodai{j},abs(I(j)-I_tikslus));
+end
 
 function d = isvestines(y,h)
 % Keturios uzduoties formules: 3 ir 5 tasku isvestines.
